@@ -69,7 +69,9 @@ services:
 
   # Frontend Production Service
   frontend:
-    image: ankitrautalways/deal-pipeline-frontend:latest
+    build:
+      context: ./deal-pipeline-ui
+    image: deal-pipeline-frontend:local
     container_name: deal-pipeline-frontend-prod
     restart: always
     ports:
