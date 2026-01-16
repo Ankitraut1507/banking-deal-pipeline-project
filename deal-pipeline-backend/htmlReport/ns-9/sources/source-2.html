@@ -1,0 +1,359 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DealServiceImpl</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.bank.pipeline.service</a>
+</div>
+
+<h1>Coverage Summary for Class: DealServiceImpl (com.bank.pipeline.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DealServiceImpl</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (14/14)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    83.3%
+  </span>
+  <span class="absValue">
+    (40/48)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (97/97)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.bank.pipeline.service;
+&nbsp;
+&nbsp;
+&nbsp;import com.bank.pipeline.dto.DealUpdateRequest;
+&nbsp;import com.bank.pipeline.dto.DealCreateRequest;
+&nbsp;import com.bank.pipeline.exception.ResourceNotFoundException;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import com.bank.pipeline.model.Deal;
+&nbsp;import com.bank.pipeline.model.DealNote;
+&nbsp;import com.bank.pipeline.model.DealStage;
+&nbsp;import com.bank.pipeline.repository.DealRepository;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.PageImpl;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;import org.springframework.security.core.context.SecurityContextHolder;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@Service
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class DealServiceImpl implements DealService {
+&nbsp;
+&nbsp;    private final DealRepository dealRepository;
+&nbsp;
+&nbsp;    // ---------------- USER ----------------
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Deal createDeal(DealCreateRequest request, String userId) {
+&nbsp;
+&nbsp;        boolean isAdmin =
+<b class="fc">&nbsp;                SecurityContextHolder.getContext()</b>
+<b class="fc">&nbsp;                        .getAuthentication()</b>
+<b class="fc">&nbsp;                        .getAuthorities()</b>
+<b class="fc">&nbsp;                        .stream()</b>
+<b class="fc">&nbsp;                        .anyMatch(a -&gt; a.getAuthority().equals(&quot;ROLE_ADMIN&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        Deal.DealBuilder builder = Deal.builder()</b>
+<b class="fc">&nbsp;                .title(request.getTitle())</b>
+<b class="fc">&nbsp;                .sector(request.getSector())</b>
+<b class="fc">&nbsp;                .dealType(request.getDealType())</b>
+<b class="fc">&nbsp;                .notes(new ArrayList&lt;&gt;())</b>
+<b class="fc">&nbsp;                .stage(DealStage.LEAD)</b>
+<b class="fc">&nbsp;                .ownerId(userId)</b>
+<b class="fc">&nbsp;                .createdAt(Instant.now())</b>
+<b class="fc">&nbsp;                .updatedAt(Instant.now());</b>
+&nbsp;
+&nbsp;
+&nbsp;        // ✅ ONLY ADMIN can set dealValue at creation
+<b class="fc">&nbsp;        if (isAdmin) {</b>
+<b class="fc">&nbsp;            builder.dealValue(request.getDealValue());</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            builder.dealValue(null);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return dealRepository.save(builder.build());</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Deal updateDeal(String dealId, DealUpdateRequest request, String userId) {
+<b class="fc">&nbsp;        Deal deal = dealRepository.findById(dealId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Deal not found: &quot; + dealId));</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean isOwner = deal.getOwnerId().equals(userId);</b>
+<b class="fc">&nbsp;        boolean isAdmin = SecurityContextHolder.getContext()</b>
+<b class="fc">&nbsp;                .getAuthentication()</b>
+<b class="fc">&nbsp;                .getAuthorities()</b>
+<b class="fc">&nbsp;                .stream()</b>
+<b class="fc">&nbsp;                .anyMatch(a -&gt; a.getAuthority().equals(&quot;ROLE_ADMIN&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!isOwner &amp;&amp; !isAdmin) {</b>
+<b class="fc">&nbsp;            throw new AccessDeniedException(&quot;Not allowed to update this deal&quot;);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // ✅ UPDATE ONLY IF VALUE IS PROVIDED
+<b class="pc">&nbsp;        if (request.getTitle() != null) {</b>
+<b class="fc">&nbsp;            deal.setTitle(request.getTitle());</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (request.getSector() != null) {</b>
+<b class="fc">&nbsp;            deal.setSector(request.getSector());</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (request.getDealType() != null) {</b>
+<b class="fc">&nbsp;            deal.setDealType(request.getDealType());</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (request.getStage() != null) {</b>
+<b class="fc">&nbsp;            deal.setStage(request.getStage());</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        deal.setUpdatedAt(Instant.now());</b>
+<b class="fc">&nbsp;        return dealRepository.save(deal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;Deal&gt; getDealsByOwner(
+&nbsp;            String userId,
+&nbsp;            Pageable pageable) {
+&nbsp;
+<b class="fc">&nbsp;        return dealRepository.findByOwnerId(userId, pageable);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------------- ADMIN ----------------
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Deal updateDealValue(
+&nbsp;            String dealId,
+&nbsp;            DealUpdateRequest request) {
+&nbsp;
+<b class="fc">&nbsp;        Deal deal = dealRepository.findById(dealId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt;</b>
+<b class="fc">&nbsp;                        new ResourceNotFoundException(</b>
+&nbsp;                                &quot;Deal not found: &quot; + dealId));
+&nbsp;
+<b class="fc">&nbsp;        deal.setDealValue(request.getDealValue());</b>
+<b class="fc">&nbsp;        deal.setUpdatedAt(Instant.now());</b>
+&nbsp;
+<b class="fc">&nbsp;        return dealRepository.save(deal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public void deleteDeal(String dealId) {
+&nbsp;
+<b class="fc">&nbsp;        Deal deal = dealRepository.findById(dealId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt;</b>
+<b class="fc">&nbsp;                        new ResourceNotFoundException(</b>
+&nbsp;                                &quot;Deal not found: &quot; + dealId));
+&nbsp;
+<b class="fc">&nbsp;        dealRepository.delete(deal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;Deal&gt; getDealsFiltered(
+&nbsp;            DealStage stage,
+&nbsp;            String sector,
+&nbsp;            Pageable pageable) {
+&nbsp;
+<b class="fc">&nbsp;        if (stage != null &amp;&amp; sector != null) {</b>
+<b class="fc">&nbsp;            return dealRepository.findByStageAndSector(stage, sector, pageable);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (stage != null) {</b>
+<b class="fc">&nbsp;            return dealRepository.findByStage(stage, pageable);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        if (sector != null) {</b>
+<b class="fc">&nbsp;            return dealRepository.findBySector(sector, pageable);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return dealRepository.findAll(pageable);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Deal getDealById(String dealId, String userId) {
+<b class="fc">&nbsp;        Deal deal = dealRepository.findById(dealId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Deal not found: &quot; + dealId));</b>
+&nbsp;
+<b class="fc">&nbsp;        if (!deal.getOwnerId().equals(userId)) {</b>
+<b class="fc">&nbsp;            throw new AccessDeniedException(&quot;You do not own this deal&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        return deal;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Deal addNote(String dealId, String userId, String noteText) {
+<b class="fc">&nbsp;        Deal deal = dealRepository.findById(dealId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Deal not found&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        DealNote note = new DealNote(userId, noteText);</b>
+<b class="fc">&nbsp;        deal.getNotes().add(note);</b>
+&nbsp;
+<b class="fc">&nbsp;        deal.setUpdatedAt(Instant.now());</b>
+<b class="fc">&nbsp;        return dealRepository.save(deal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Deal deleteNote(String dealId, String noteId, String userId) {
+&nbsp;
+<b class="fc">&nbsp;        Deal deal = dealRepository.findById(dealId)</b>
+<b class="fc">&nbsp;                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;Deal not found&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean isAdmin = SecurityContextHolder.getContext()</b>
+<b class="fc">&nbsp;                .getAuthentication()</b>
+<b class="fc">&nbsp;                .getAuthorities()</b>
+<b class="fc">&nbsp;                .stream()</b>
+<b class="fc">&nbsp;                .anyMatch(a -&gt; a.getAuthority().equals(&quot;ROLE_ADMIN&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;        boolean removed = deal.getNotes().removeIf(note -&gt;</b>
+<b class="fc">&nbsp;                note.getNoteId().equals(noteId) &amp;&amp;</b>
+<b class="fc">&nbsp;                        (isAdmin || note.getUserId().equals(userId))</b>
+&nbsp;        );
+&nbsp;
+<b class="fc">&nbsp;        if (!removed) {</b>
+<b class="fc">&nbsp;            throw new AccessDeniedException(&quot;Not allowed to delete this note&quot;);</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        deal.setUpdatedAt(Instant.now());</b>
+<b class="fc">&nbsp;        return dealRepository.save(deal);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @Override
+&nbsp;    public Page&lt;Deal&gt; searchDeals(String query, DealStage stage, String sector, Pageable pageable) {
+&nbsp;        // For now, implement basic text search on title and sector
+&nbsp;        // In a real implementation, you might use MongoDB text indexes
+<b class="fc">&nbsp;        if (query == null || query.trim().isEmpty()) {</b>
+<b class="fc">&nbsp;            return dealRepository.findAll(pageable);</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        // Simple case-insensitive search on title and sector
+<b class="fc">&nbsp;        String searchQuery = query.toLowerCase().trim();</b>
+<b class="fc">&nbsp;        Page&lt;Deal&gt; allDeals = dealRepository.findAll(pageable);</b>
+&nbsp;        
+<b class="fc">&nbsp;        List&lt;Deal&gt; filteredDeals = allDeals.getContent().stream()</b>
+<b class="fc">&nbsp;                .filter(deal -&gt; {</b>
+<b class="pc">&nbsp;                    boolean matchesTitle = deal.getTitle() != null &amp;&amp; </b>
+<b class="fc">&nbsp;                            deal.getTitle().toLowerCase().contains(searchQuery);</b>
+<b class="pc">&nbsp;                    boolean matchesSector = deal.getSector() != null &amp;&amp; </b>
+<b class="fc">&nbsp;                            deal.getSector().toLowerCase().contains(searchQuery);</b>
+&nbsp;                    
+<b class="fc">&nbsp;                    return (matchesTitle || matchesSector);</b>
+&nbsp;                })
+<b class="pc">&nbsp;                .filter(deal -&gt; stage == null || deal.getStage() == stage)</b>
+<b class="pc">&nbsp;                .filter(deal -&gt; sector == null || sector.isEmpty() || deal.getSector().equals(sector))</b>
+<b class="fc">&nbsp;                .collect(Collectors.toList());</b>
+&nbsp;
+<b class="fc">&nbsp;        return new org.springframework.data.domain.PageImpl&lt;&gt;(</b>
+&nbsp;                filteredDeals, 
+&nbsp;                pageable, 
+<b class="fc">&nbsp;                filteredDeals.size()</b>
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-13 22:01</div>
+</div>
+</body>
+</html>

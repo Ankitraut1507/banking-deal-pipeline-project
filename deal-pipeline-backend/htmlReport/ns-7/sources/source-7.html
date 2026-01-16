@@ -1,0 +1,109 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Deal</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.bank.pipeline.model</a>
+</div>
+
+<h1>Coverage Summary for Class: Deal (com.bank.pipeline.model)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">Deal</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.bank.pipeline.model;
+&nbsp;
+&nbsp;import lombok.*;
+&nbsp;import org.springframework.data.annotation.Id;
+&nbsp;import org.springframework.data.mongodb.core.mapping.Document;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;@Data
+&nbsp;@Builder
+&nbsp;@NoArgsConstructor
+&nbsp;@AllArgsConstructor
+&nbsp;@Document(collection = &quot;deals&quot;)
+&nbsp;public class Deal{
+&nbsp;
+&nbsp;    @Id
+&nbsp;    private String id;
+&nbsp;
+&nbsp;    // Basic info
+&nbsp;    private String title;          // Deal summary/title
+&nbsp;    private String sector;         // Technology, Healthcare, etc.
+&nbsp;    private DealType dealType;
+&nbsp;
+&nbsp;    // Pipeline
+&nbsp;    private DealStage stage;
+&nbsp;
+&nbsp;    // Sensitive (ADMIN only)
+&nbsp;    private Double dealValue;
+&nbsp;
+&nbsp;    // Collaboration
+&nbsp;    private List&lt;DealNote&gt; notes;
+&nbsp;
+&nbsp;
+&nbsp;    // Ownership
+&nbsp;    private String ownerId;        // User who created/owns deal
+&nbsp;
+&nbsp;    // Audit
+&nbsp;    private Instant createdAt;
+&nbsp;    private Instant updatedAt;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-13 22:01</div>
+</div>
+</body>
+</html>

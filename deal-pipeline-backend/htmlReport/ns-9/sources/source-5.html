@@ -1,0 +1,104 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.bank.pipeline.service</a>
+</div>
+
+<h1>Coverage Summary for Class: UserService (com.bank.pipeline.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">UserService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.bank.pipeline.service;
+&nbsp;
+&nbsp;import com.bank.pipeline.model.User;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;
+&nbsp;
+&nbsp;public interface UserService {
+&nbsp;    //will create new user
+&nbsp;    User createUser(User user);
+&nbsp;
+&nbsp;    //find user by username
+&nbsp;    User findByUsername(String username);
+&nbsp;
+&nbsp;    //find user by email
+&nbsp;    User findByEmail(String email);
+&nbsp;
+&nbsp;    //check if username exist
+&nbsp;    boolean existsByUsername(String username);
+&nbsp;
+&nbsp;    //check if email exist
+&nbsp;    boolean existsByEmail(String email);
+&nbsp;
+&nbsp;    //ADMIN use‑case
+&nbsp;    List&lt;User&gt; findAll();
+&nbsp;
+&nbsp;    //Promote User
+&nbsp;    User promoteToAdmin(String username);
+&nbsp;
+&nbsp;    User updateUserStatus(String username, boolean active);
+&nbsp;
+&nbsp;    void deleteUser(String username);
+&nbsp;
+&nbsp;    User resetPassword(String username, String newPassword);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-13 22:01</div>
+</div>
+</body>
+</html>

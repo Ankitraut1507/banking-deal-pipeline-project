@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > SecurityConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.bank.pipeline.security</a>
+</div>
+
+<h1>Coverage Summary for Class: SecurityConfig (com.bank.pipeline.security)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SecurityConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$0</td>
+  </tr>
+  <tr>
+    <td class="name">SecurityConfig$$SpringCGLIB$$FastClass$$1</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (6/6)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (16/16)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.bank.pipeline.security;
+&nbsp;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;import org.springframework.http.HttpMethod;
+&nbsp;import org.springframework.security.authentication.AuthenticationManager;
+&nbsp;import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+&nbsp;import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+&nbsp;import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+&nbsp;import org.springframework.security.config.http.SessionCreationPolicy;
+&nbsp;import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+&nbsp;import org.springframework.security.crypto.password.PasswordEncoder;
+&nbsp;import org.springframework.security.web.SecurityFilterChain;
+&nbsp;import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+&nbsp;
+&nbsp;/**Spring Security Configuration*/
+&nbsp;@Configuration
+&nbsp;@EnableMethodSecurity   // enables @PreAuthorize (future use)
+&nbsp;public class SecurityConfig {
+&nbsp;
+&nbsp;    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+&nbsp;
+<b class="fc">&nbsp;    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {</b>
+<b class="fc">&nbsp;        this.jwtAuthenticationFilter = jwtAuthenticationFilter;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /** Main security filter chain. */
+&nbsp;    @Bean
+&nbsp;    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+&nbsp;
+<b class="fc">&nbsp;        http</b>
+&nbsp;                // ✅ ENABLE CORS (CRITICAL)
+<b class="fc">&nbsp;                .cors(cors -&gt; {})</b>
+&nbsp;
+&nbsp;                // Disable CSRF (JWT-based REST API)
+<b class="fc">&nbsp;                .csrf(AbstractHttpConfigurer::disable)</b>
+&nbsp;
+&nbsp;                // Stateless session management
+<b class="fc">&nbsp;                .sessionManagement(session -&gt;</b>
+<b class="fc">&nbsp;                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)</b>
+&nbsp;                )
+&nbsp;
+&nbsp;                // Authorization rules
+<b class="fc">&nbsp;                .authorizeHttpRequests(auth -&gt; auth</b>
+&nbsp;
+&nbsp;                        // ✅ ALLOW PREFLIGHT REQUESTS (CRITICAL)
+<b class="fc">&nbsp;                        .requestMatchers(HttpMethod.OPTIONS, &quot;/**&quot;).permitAll()</b>
+&nbsp;
+&nbsp;                        // Public endpoints
+<b class="fc">&nbsp;                        .requestMatchers(&quot;/api/auth/login&quot;).permitAll()</b>
+<b class="fc">&nbsp;                        .requestMatchers(&quot;/api/users/init-admin&quot;).permitAll()</b>
+&nbsp;
+&nbsp;                        // Everything else requires authentication
+<b class="fc">&nbsp;                        .anyRequest().authenticated()</b>
+&nbsp;                )
+&nbsp;
+&nbsp;                // Register JWT filter
+<b class="fc">&nbsp;                .addFilterBefore(</b>
+&nbsp;                        jwtAuthenticationFilter,
+&nbsp;                        UsernamePasswordAuthenticationFilter.class
+&nbsp;                );
+&nbsp;
+<b class="fc">&nbsp;        return http.build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    /**Password encoder (BCrypt).*/
+&nbsp;    @Bean
+&nbsp;    public PasswordEncoder passwordEncoder() {
+<b class="fc">&nbsp;        return new BCryptPasswordEncoder();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**AuthenticationManager (future-proofing).*/
+&nbsp;    @Bean
+&nbsp;    public AuthenticationManager authenticationManager(
+&nbsp;            AuthenticationConfiguration configuration)
+&nbsp;            throws Exception {
+&nbsp;
+<b class="fc">&nbsp;        return configuration.getAuthenticationManager();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-13 22:01</div>
+</div>
+</body>
+</html>

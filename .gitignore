@@ -1,0 +1,45 @@
+# Environment files
+.env
+.env.production
+.env.staging
+.env.local
+
+# Secrets directory
+secrets/*
+!secrets/.gitkeep
+
+# SSL certificates
+ssl/
+*.pem
+*.key
+*.crt
+
+# Logs
+logs/
+*.log
+
+# Docker
+.dockerignore
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+target/
+dist/
+node_modules/
+
+# Backup files
+*.backup
+*.bak
+
+# Temporary files
+tmp/
+temp/

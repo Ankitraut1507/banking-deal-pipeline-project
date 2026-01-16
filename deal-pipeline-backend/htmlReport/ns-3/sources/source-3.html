@@ -1,0 +1,255 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > UserController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.bank.pipeline.controller</a>
+</div>
+
+<h1>Coverage Summary for Class: UserController (com.bank.pipeline.controller)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserController</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">UserController$$SpringCGLIB$$0</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/30)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.bank.pipeline.controller;
+&nbsp;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.security.access.prepost.PreAuthorize;
+&nbsp;import org.springframework.security.core.Authentication;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import com.bank.pipeline.dto.CreateUserRequest;
+&nbsp;import com.bank.pipeline.dto.UserResponse;
+&nbsp;import com.bank.pipeline.mapper.UserMapper;
+&nbsp;import com.bank.pipeline.model.User;
+&nbsp;import com.bank.pipeline.service.UserService;
+&nbsp;
+&nbsp;import jakarta.validation.Valid;
+&nbsp;import lombok.RequiredArgsConstructor;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/api/users&quot;)
+&nbsp;@RequiredArgsConstructor
+&nbsp;public class UserController {
+&nbsp;
+&nbsp;    private final UserService userService;
+&nbsp;
+&nbsp;    // CREATE INITIAL ADMIN (NO AUTH REQUIRED - ONLY FOR SETUP)
+&nbsp;    @PostMapping(&quot;/init-admin&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; createInitialAdmin(
+&nbsp;            @Valid @RequestBody CreateUserRequest request) {
+&nbsp;        
+&nbsp;        // Temporarily allow admin creation without check
+&nbsp;        // In production, you should implement proper admin check
+&nbsp;        
+&nbsp;        // Force role to ADMIN for this endpoint
+<b class="nc">&nbsp;        User user = UserMapper.toEntity(request);</b>
+<b class="nc">&nbsp;        user.setRole(com.bank.pipeline.model.Role.ADMIN);</b>
+<b class="nc">&nbsp;        User createdUser = userService.createUser(user);</b>
+<b class="nc">&nbsp;        UserResponse response = UserMapper.toResponse(createdUser);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Create User (ADMIN ONLY)
+&nbsp;    @PostMapping
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; createUser(
+&nbsp;            @Valid @RequestBody CreateUserRequest request) {
+&nbsp;
+<b class="nc">&nbsp;        User user = UserMapper.toEntity(request);</b>
+<b class="nc">&nbsp;        User createdUser = userService.createUser(user);</b>
+<b class="nc">&nbsp;        UserResponse response = UserMapper.toResponse(createdUser);</b>
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(response, HttpStatus.CREATED);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    //  Get User by Username
+&nbsp;    @GetMapping(&quot;/username/{username}&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; getUserByUsername(
+&nbsp;            @PathVariable String username) {
+&nbsp;
+<b class="nc">&nbsp;        User user = userService.findByUsername(username);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(UserMapper.toResponse(user));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get User by Email
+&nbsp;    @GetMapping(&quot;/email/{email}&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; getUserByEmail(
+&nbsp;            @PathVariable String email) {
+&nbsp;
+<b class="nc">&nbsp;        User user = userService.findByEmail(email);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(UserMapper.toResponse(user));</b>
+&nbsp;    }
+&nbsp;    //  ADMIN ONLY — Get all users
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)
+&nbsp;    @GetMapping
+&nbsp;    public ResponseEntity&lt;List&lt;UserResponse&gt;&gt; getAllUsers() {
+<b class="nc">&nbsp;        List&lt;UserResponse&gt; users = userService.findAll()</b>
+<b class="nc">&nbsp;                .stream()</b>
+<b class="nc">&nbsp;                .map(UserMapper::toResponse)</b>
+<b class="nc">&nbsp;                .toList();</b>
+&nbsp;
+<b class="nc">&nbsp;        return ResponseEntity.ok(users);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // Get Current Logged-in User
+&nbsp;    @GetMapping(&quot;/me&quot;)
+&nbsp;    @PreAuthorize(&quot;hasAnyRole(&#39;USER&#39;,&#39;ADMIN&#39;)&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; getCurrentUser(Authentication authentication) {
+&nbsp;
+<b class="nc">&nbsp;        String username = authentication.getName();</b>
+<b class="nc">&nbsp;        User user = userService.findByUsername(username);</b>
+&nbsp;
+<b class="nc">&nbsp;        return ResponseEntity.ok(UserMapper.toResponse(user));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------------- ADMIN: USER MANAGEMENT ----------------
+&nbsp;    
+&nbsp;    // ADMIN ONLY — Promote user to ADMIN
+&nbsp;    @PatchMapping(&quot;/{username}/make-admin&quot;)
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; promoteUserToAdmin(
+&nbsp;            @PathVariable String username) {
+&nbsp;
+<b class="nc">&nbsp;        User updatedUser = userService.promoteToAdmin(username);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(UserMapper.toResponse(updatedUser));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PatchMapping(&quot;/{username}/status&quot;)
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; updateUserStatus(
+&nbsp;            @PathVariable String username,
+&nbsp;            @RequestParam boolean active) {
+&nbsp;
+<b class="nc">&nbsp;        User updatedUser = userService.updateUserStatus(username, active);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(UserMapper.toResponse(updatedUser));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // DELETE USER (ADMIN ONLY)
+&nbsp;    @DeleteMapping(&quot;/{username}&quot;)
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)
+&nbsp;    public ResponseEntity&lt;Void&gt; deleteUser(@PathVariable String username) {
+<b class="nc">&nbsp;        userService.deleteUser(username);</b>
+<b class="nc">&nbsp;        return ResponseEntity.noContent().build();</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // RESET USER PASSWORD (ADMIN ONLY)
+&nbsp;    @PutMapping(&quot;/{username}/password&quot;)
+&nbsp;    @PreAuthorize(&quot;hasRole(&#39;ADMIN&#39;)&quot;)
+&nbsp;    public ResponseEntity&lt;UserResponse&gt; resetUserPassword(
+&nbsp;            @PathVariable String username,
+&nbsp;            @RequestBody Map&lt;String, String&gt; request) {
+&nbsp;        
+<b class="nc">&nbsp;        String newPassword = request.get(&quot;newPassword&quot;);</b>
+<b class="nc">&nbsp;        User updatedUser = userService.resetPassword(username, newPassword);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(UserMapper.toResponse(updatedUser));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-13 22:01</div>
+</div>
+</body>
+</html>

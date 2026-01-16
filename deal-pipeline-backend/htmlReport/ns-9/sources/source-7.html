@@ -1,0 +1,109 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DealService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.bank.pipeline.service</a>
+</div>
+
+<h1>Coverage Summary for Class: DealService (com.bank.pipeline.service)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">DealService</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.bank.pipeline.service;
+&nbsp;
+&nbsp;import com.bank.pipeline.dto.DealUpdateRequest;
+&nbsp;import com.bank.pipeline.dto.DealCreateRequest;
+&nbsp;import com.bank.pipeline.model.Deal;
+&nbsp;import com.bank.pipeline.model.DealStage;
+&nbsp;import org.springframework.data.domain.Page;
+&nbsp;import org.springframework.data.domain.Pageable;
+&nbsp;
+&nbsp;public interface DealService {
+&nbsp;
+&nbsp;    Deal createDeal(DealCreateRequest request, String userId);
+&nbsp;
+&nbsp;    Deal updateDeal(String dealId, DealUpdateRequest request, String userId);
+&nbsp;
+&nbsp;
+&nbsp;    Page&lt;Deal&gt; getDealsByOwner(String userId, Pageable pageable);
+&nbsp;
+&nbsp;    // NEW (FILTERING)
+&nbsp;    Page&lt;Deal&gt; getDealsFiltered(
+&nbsp;            DealStage stage,
+&nbsp;            String sector,
+&nbsp;            Pageable pageable
+&nbsp;    );
+&nbsp;
+&nbsp;    Deal updateDealValue(String dealId, DealUpdateRequest request);
+&nbsp;
+&nbsp;    void deleteDeal(String dealId);
+&nbsp;
+&nbsp;    Deal getDealById(String dealId, String userId);
+&nbsp;
+&nbsp;
+&nbsp;    Deal addNote(String dealId, String userId, String note);
+&nbsp;
+&nbsp;    Deal deleteNote(String dealId, String noteId, String userId);
+&nbsp;
+&nbsp;    Page&lt;Deal&gt; searchDeals(String query, DealStage stage, String sector, Pageable pageable);
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-13 22:01</div>
+</div>
+</body>
+</html>

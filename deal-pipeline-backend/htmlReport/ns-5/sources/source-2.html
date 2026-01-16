@@ -1,0 +1,215 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > GlobalExceptionHandler</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.bank.pipeline.exception</a>
+</div>
+
+<h1>Coverage Summary for Class: GlobalExceptionHandler (com.bank.pipeline.exception)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">GlobalExceptionHandler</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    14.3%
+  </span>
+  <span class="absValue">
+    (1/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    4.5%
+  </span>
+  <span class="absValue">
+    (1/22)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.bank.pipeline.exception;
+&nbsp;
+&nbsp;import org.springframework.security.access.AccessDeniedException;
+&nbsp;import jakarta.servlet.http.HttpServletRequest;
+&nbsp;import org.springframework.http.HttpStatus;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.MethodArgumentNotValidException;
+&nbsp;import org.springframework.web.bind.annotation.ControllerAdvice;
+&nbsp;import org.springframework.web.bind.annotation.ExceptionHandler;
+&nbsp;
+&nbsp;import java.time.Instant;
+&nbsp;
+&nbsp;@ControllerAdvice
+<b class="fc">&nbsp;public class GlobalExceptionHandler {</b>
+&nbsp;
+&nbsp;    // ---------- COMMON BUILDER ----------
+&nbsp;    private ResponseEntity&lt;ApiErrorResponse&gt; buildError(
+&nbsp;            HttpStatus status,
+&nbsp;            String error,
+&nbsp;            String message,
+&nbsp;            HttpServletRequest request
+&nbsp;    ) {
+<b class="nc">&nbsp;        ApiErrorResponse response = ApiErrorResponse.builder()</b>
+<b class="nc">&nbsp;                .status(status.value())</b>
+<b class="nc">&nbsp;                .error(error)</b>
+<b class="nc">&nbsp;                .message(message)</b>
+<b class="nc">&nbsp;                .path(request.getRequestURI())</b>
+<b class="nc">&nbsp;                .timestamp(Instant.now())</b>
+<b class="nc">&nbsp;                .build();</b>
+&nbsp;
+<b class="nc">&nbsp;        return new ResponseEntity&lt;&gt;(response, status);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------- 404 ----------
+&nbsp;    @ExceptionHandler({
+&nbsp;            UserNotFoundException.class,
+&nbsp;            ResourceNotFoundException.class
+&nbsp;    })
+&nbsp;    public ResponseEntity&lt;ApiErrorResponse&gt; handleNotFound(
+&nbsp;            RuntimeException ex,
+&nbsp;            HttpServletRequest request
+&nbsp;    ) {
+<b class="nc">&nbsp;        return buildError(</b>
+&nbsp;                HttpStatus.NOT_FOUND,
+&nbsp;                &quot;Resource Not Found&quot;,
+<b class="nc">&nbsp;                ex.getMessage(),</b>
+&nbsp;                request
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------- 403 ----------
+&nbsp;    @ExceptionHandler(AccessDeniedException.class)
+&nbsp;    public ResponseEntity&lt;ApiErrorResponse&gt; handleForbidden(
+&nbsp;            AccessDeniedException ex,
+&nbsp;            HttpServletRequest request
+&nbsp;    ) {
+<b class="nc">&nbsp;        return buildError(</b>
+&nbsp;                HttpStatus.FORBIDDEN,
+&nbsp;                &quot;Access Denied&quot;,
+<b class="nc">&nbsp;                ex.getMessage(),</b>
+&nbsp;                request
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------- 409 ----------
+&nbsp;    @ExceptionHandler(BusinessException.class)
+&nbsp;    public ResponseEntity&lt;ApiErrorResponse&gt; handleConflict(
+&nbsp;            RuntimeException ex,
+&nbsp;            HttpServletRequest request
+&nbsp;    ) {
+<b class="nc">&nbsp;        return buildError(</b>
+&nbsp;                HttpStatus.CONFLICT,
+&nbsp;                &quot;Conflict&quot;,
+<b class="nc">&nbsp;                ex.getMessage(),</b>
+&nbsp;                request
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------- 400 (Validation) ----------
+&nbsp;    @ExceptionHandler(MethodArgumentNotValidException.class)
+&nbsp;    public ResponseEntity&lt;ApiErrorResponse&gt; handleValidation(
+&nbsp;            MethodArgumentNotValidException ex,
+&nbsp;            HttpServletRequest request
+&nbsp;    ) {
+<b class="nc">&nbsp;        String message = ex.getBindingResult()</b>
+<b class="nc">&nbsp;                .getFieldErrors()</b>
+<b class="nc">&nbsp;                .get(0)</b>
+<b class="nc">&nbsp;                .getDefaultMessage();</b>
+&nbsp;
+<b class="nc">&nbsp;        return buildError(</b>
+&nbsp;                HttpStatus.BAD_REQUEST,
+&nbsp;                &quot;Validation Failed&quot;,
+&nbsp;                message,
+&nbsp;                request
+&nbsp;        );
+&nbsp;    }
+&nbsp;
+&nbsp;    // ---------- FALLBACK ----------
+&nbsp;    @ExceptionHandler(Exception.class)
+&nbsp;    public ResponseEntity&lt;ApiErrorResponse&gt; handleGeneric(
+&nbsp;            Exception ex,
+&nbsp;            HttpServletRequest request
+&nbsp;    ) {
+<b class="nc">&nbsp;        return buildError(</b>
+&nbsp;                HttpStatus.INTERNAL_SERVER_ERROR,
+&nbsp;                &quot;Internal Server Error&quot;,
+<b class="nc">&nbsp;                ex.getMessage(),</b>
+&nbsp;                request
+&nbsp;        );
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-01-13 22:01</div>
+</div>
+</body>
+</html>
