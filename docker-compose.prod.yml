@@ -1,7 +1,6 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  # MongoDB Production Service
   mongodb:
     image: mongo:7.0
     container_name: deal-pipeline-mongodb-prod
@@ -18,18 +17,10 @@ services:
     secrets:
       - mongo_root_username
       - mongo_root_password
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '0.5'
-        reservations:
-          memory: 512M
-          cpus: '0.25'
 
-  # Backend Production Service
   backend:
     image: ankitrautalways/deal-pipeline-backend:latest
+    container_name: deal-pipeline-backend-prod
     restart: always
     environment:
       SPRING_PROFILES_ACTIVE: prod
@@ -37,8 +28,6 @@ services:
       JWT_SECRET_FILE: /run/secrets/jwt_secret
       MONGO_APP_PASSWORD_FILE: /run/secrets/mongo_app_password
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
-    ports:
-      - "8080:8080"
     depends_on:
       - mongodb
     networks:
@@ -52,27 +41,11 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
-    deploy:
-      resources:
-        limits:
-          memory: 1G
-          cpus: '1.0'
-        reservations:
-          memory: 512M
-          cpus: '0.5'
-      replicas: 2
-      update_config:
-        parallelism: 1
-        delay: 10s
-        order: start-first
 
-  # Frontend Production Service
   frontend:
     image: ankitrautalways/deal-pipeline-frontend:latest
+    container_name: deal-pipeline-frontend-prod
     restart: always
-    ports:
-      - "80:80"
-      - "443:443"
     depends_on:
       - backend
     networks:
@@ -84,29 +57,20 @@ services:
       retries: 3
       start_period: 60s
 
-  # Reverse Proxy (Optional for SSL termination)
   nginx-proxy:
     image: nginx:alpine
     container_name: deal-pipeline-proxy-prod
     restart: always
     ports:
       - "80:80"
-      - "443:443"
     volumes:
       - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
     depends_on:
       - frontend
       - backend
     networks:
       - deal-pipeline-network
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.25'
 
-# Secrets Management
 secrets:
   jwt_secret:
     file: ./secrets/jwt_secret.txt
@@ -117,19 +81,9 @@ secrets:
   mongo_app_password:
     file: ./secrets/mongo_app_password.txt
 
-# Named Volumes
 volumes:
   mongodb_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: /data/mongodb
 
-# Networks
 networks:
   deal-pipeline-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.21.0.0/16
