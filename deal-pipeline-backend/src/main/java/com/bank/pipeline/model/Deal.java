@@ -1,3 +1,4 @@
+
 package com.bank.pipeline.model;
 
 import lombok.*;

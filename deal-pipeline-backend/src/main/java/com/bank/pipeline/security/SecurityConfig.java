@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**Spring Security Configuration*/
 @Configuration
-@EnableMethodSecurity   // enables @PreAuthorize (future use)
+@EnableMethodSecurity   // enables @PreAuthorize 
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -30,7 +30,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // ✅ ENABLE CORS (CRITICAL)
+                //  ENABLE CORS (CRITICAL)
                 .cors(cors -> {})
 
                 // Disable CSRF (JWT-based REST API)
@@ -44,7 +44,7 @@ public class SecurityConfig {
                 // Authorization rules
                 .authorizeHttpRequests(auth -> auth
 
-                        // ✅ ALLOW PREFLIGHT REQUESTS (CRITICAL)
+                        //  ALLOW PREFLIGHT REQUESTS (CRITICAL)
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers("/actuator/health", "/actuator/health/**", "/actuator/info").permitAll()
